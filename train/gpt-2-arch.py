@@ -326,6 +326,12 @@ for step in range(max_steps):
     if master_process:
         print(f"step {step:5d} | loss: {loss_accum.item():.6f} | lr {lr:.4e} | norm: {norm:.4f} | dt: {dt*1000:.2f}ms | tok/sec: {tokens_per_sec:.2f}")
 
+# Saving the model
+model_save_path = "/kaggle/working/consolidated.00.pth"
+if master_process:
+    torch.save(raw_model.state_dict(), model_save_path)
+    print(f"Model saved to {model_save_path}")
+
 #Majorty not require in collab bc of the single gpu
 if ddp:
     destroy_process_group()

@@ -1,27 +1,86 @@
-# Quantgpt
+# QuantGPT
 
-https://huggingface.co/AryanNsc/QuantGPT
-Base model
+[![Hugging Face](https://img.shields.io/badge/🤗-HuggingFace-blue.svg)](https://huggingface.co/AryanNsc/QuantGPT)
 
-A smaller version of GPT-2(124M) training code 
+QuantGPT is a smaller GPT-2 (124M) variant with optimized training scripts.  
+It comes with training code and Colab-friendly settings for fast prototyping on limited resources.
 
-You can run the code on colab just first use the data_prep script to create the shards we are only training on 100M tokens for now
+---
 
-*.bf16 features requires at least a compute capability of sm_80, which is available on NVIDIA GPUs starting from the Ampere architecture so we are using fp16 in colab
+## 🚀 Base Model
+We provide a compact GPT-2-style language model (~124M parameters) optimized for speed and efficiency.
 
-## Data Dir 
-use this for loading FineWeb-MINI Dataset
-https://huggingface.co/datasets/AryanNsc/FineWeb-Mini
+- **Framework**: PyTorch  
+- **Dataset**: [FineWeb-Mini](https://huggingface.co/datasets/AryanNsc/FineWeb-Mini)  
+- **Training Tokens**: ~100M  
+- **Precision**: Uses `fp16` for Colab compatibility. (`bf16` requires NVIDIA Ampere GPUs and above)  
 
-## TODO
+---
 
-- [0] **Improve speed:** We are only getting 20k token/s speed in colab we have to imporve it 
-- [0] **Modify code for kaggle notebook** Modifying the code for the kaggle notebook support bc it has 2*T4 GPU
-- [0] **Saving the model** We have to save the model and add further inference caps
-- [0] **Running in Tinyops** Loading of model in tinyops and do inference
+## 📂 Dataset
+For training, we use the **FineWeb-MINI** dataset.  
 
-### Contributing
-Contributions are welcome! Feel free to open issues, submit pull requests, or provide feedback.
+```python
+from datasets import load_dataset
 
-### License
-MIT
+dataset = load_dataset("AryanNsc/FineWeb-Mini")
+```
+
+This dataset is already tokenized and sharded for optimized training.
+
+---
+
+## 💻 Training on Colab
+1. First, prepare data shards:
+
+```bash
+python data_prep.py
+```
+
+2. Then, start training:
+
+```bash
+python train/gpt-2-arch.py
+```
+
+Colab uses a single T4 GPU; `fp16` precision is enabled by default.
+
+---
+
+## 🧩 New Models Training
+In addition to QuantGPT, we are also training **QuantMobile-17M** —  
+a small, highly efficient, and deployable transformer-based language model.
+
+Key highlights of **MobileLLM**:
+- Uses **RMSNorm** and **Rotary Position Embeddings (RoPE)** for better efficiency.
+- Implements **multi-query attention** for faster inference.
+- Integrated **safetensors** for optimized checkpointing.
+- Uses **PyArrow Parquet** data loaders for high-throughput token streaming.
+- Fully supports **DDP (Distributed Data Parallel)** training out of the box.
+- Integrated with **Weights & Biases** (`wandb`) for live monitoring.
+
+### Training Example
+```bash
+python train/mobile_llm-arch.py
+```
+
+---
+
+## 📦 Model Checkpoints
+We save model checkpoints using `safetensors` format for fast loading and secure storage.
+
+- Final trained model → `mobile_llm_final.safetensors`
+- Intermediate checkpoints → `checkpoints/mobile_llm_step_<step>.safetensors`
+
+---
+
+## 📜 License
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+
+## 🌐 Links
+- **Model**: [QuantGPT on HuggingFace](https://huggingface.co/AryanNsc/QuantGPT)
+- **QuantMobile**: [QuantMobile on HuggingFace](https://huggingface.co/AryanNsc/QuantMobile-17M)
+- **Dataset**: [FineWeb-MINI](https://huggingface.co/datasets/AryanNsc/FineWeb-Mini)
